@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'transaction_page.dart';
+import '../core/design_system/app_colors.dart';
+import '../core/design_system/app_typography.dart';
+import '../core/design_system/app_spacing.dart';
+import '../core/design_system/app_radius.dart';
+import '../core/design_system/app_theme.dart';
+import 'package:nubank_clone/features/transactions/presentation/pages/transaction_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -31,87 +36,93 @@ class _HomePageState extends State<HomePage>
     final titleFont = isTablet ? 32.0 : 22.0;
     final padding = isTablet ? 48.0 : 16.0;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('NuBank Clone'),
-        centerTitle: true,
-        bottom: TabBar(
+    return Theme(
+      data: AppTheme.light,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'NuBank Clone',
+            style: AppTypography.title.copyWith(color: Colors.white),
+          ),
+          centerTitle: true,
+          backgroundColor: AppColors.primary,
+          bottom: TabBar(
+            controller: _tabController,
+            indicatorColor: AppColors.accent,
+            tabs: const [
+              Tab(icon: Icon(Icons.dashboard), text: 'Início'),
+              Tab(icon: Icon(Icons.person), text: 'Perfil'),
+            ],
+          ),
+        ),
+        body: TabBarView(
           controller: _tabController,
-          indicatorColor: Colors.white,
-          tabs: const [
-            Tab(icon: Icon(Icons.dashboard), text: 'Início'),
-            Tab(icon: Icon(Icons.person), text: 'Perfil'),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: isTablet ? AppSpacing.lg : AppSpacing.md),
+                  Text(
+                    'Olá, Usuário',
+                    style: AppTypography.title.copyWith(fontSize: titleFont),
+                  ),
+                  SizedBox(height: isTablet ? AppSpacing.lg : AppSpacing.md),
+                  Expanded(
+                    child: GridView.count(
+                      crossAxisCount: isTablet ? 4 : 2,
+                      mainAxisSpacing: isTablet ? AppSpacing.lg : AppSpacing.md,
+                      crossAxisSpacing: isTablet
+                          ? AppSpacing.lg
+                          : AppSpacing.md,
+                      childAspectRatio: 1,
+                      children: [
+                        _HomeIconButton(
+                          icon: Icons.account_balance_wallet,
+                          label: 'Transações',
+                          color: AppColors.primary,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const TransactionPage(),
+                              ),
+                            );
+                          },
+                        ),
+                        _HomeIconButton(
+                          icon: Icons.credit_card,
+                          label: 'Cartões',
+                          color: AppColors.secondary,
+                          onTap: () {},
+                        ),
+                        _HomeIconButton(
+                          icon: Icons.attach_money,
+                          label: 'Investimentos',
+                          color: AppColors.accent,
+                          onTap: () {},
+                        ),
+                        _HomeIconButton(
+                          icon: Icons.settings,
+                          label: 'Configurações',
+                          color: AppColors.border,
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Perfil Tab
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Center(
+                child: _ProfileTab(isTablet: isTablet, titleFont: titleFont),
+              ),
+            ),
           ],
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          Padding(
-            padding: EdgeInsets.all(padding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: isTablet ? 32 : 16),
-                Text(
-                  'Olá, Usuário',
-                  style: TextStyle(
-                    fontSize: titleFont,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: isTablet ? 32 : 16),
-                Expanded(
-                  child: GridView.count(
-                    crossAxisCount: isTablet ? 4 : 2,
-                    mainAxisSpacing: isTablet ? 32 : 16,
-                    crossAxisSpacing: isTablet ? 32 : 16,
-                    childAspectRatio: 1,
-                    children: [
-                      _HomeIconButton(
-                        icon: Icons.account_balance_wallet,
-                        label: 'Transações',
-                        color: const Color(0xFF820AD1),
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const TransactionPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      _HomeIconButton(
-                        icon: Icons.credit_card,
-                        label: 'Cartões',
-                        color: const Color(0xFF00B4AA),
-                        onTap: () {},
-                      ),
-                      _HomeIconButton(
-                        icon: Icons.attach_money,
-                        label: 'Investimentos',
-                        color: Colors.amber[700]!,
-                        onTap: () {},
-                      ),
-                      _HomeIconButton(
-                        icon: Icons.settings,
-                        label: 'Configurações',
-                        color: Colors.grey[700]!,
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Perfil Tab
-          Padding(
-            padding: EdgeInsets.all(padding),
-            child: Center(
-              child: _ProfileTab(isTablet: isTablet, titleFont: titleFont),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -135,27 +146,26 @@ class _HomeIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.of(context).size.width >= 600;
     return InkWell(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
         padding: EdgeInsets.symmetric(
-          vertical: isTablet ? 32 : 20,
-          horizontal: 8,
+          vertical: isTablet ? AppSpacing.lg : AppSpacing.md,
+          horizontal: AppSpacing.sm,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: isTablet ? 56 : 36, color: color),
-            SizedBox(height: isTablet ? 24 : 12),
+            SizedBox(height: isTablet ? AppSpacing.md : AppSpacing.sm),
             Text(
               label,
-              style: TextStyle(
+              style: AppTypography.subtitle.copyWith(
                 fontSize: isTablet ? 22 : 16,
-                fontWeight: FontWeight.w600,
                 color: color,
               ),
               textAlign: TextAlign.center,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nubank_clone/ui/transaction_page.dart';
+import 'package:nubank_clone/features/transactions/presentation/pages/transaction_page.dart';
 import 'package:nubank_clone/features/transactions/presentation/bloc/transaction_bloc.dart';
 import 'package:nubank_clone/features/transactions/domain/usecases/add_transaction_usecase.dart';
 import 'package:nubank_clone/features/transactions/domain/usecases/fetch_transactions_usecase.dart';
@@ -47,7 +47,7 @@ void main() {
             addTransactionUseCase: MockAddTransactionUseCase(),
             fetchTransactionsUseCase: MockFetchTransactionsUseCase(),
           ),
-          child: const TransactionView(),
+          child: const TransactionPage(),
         ),
       ),
     );
