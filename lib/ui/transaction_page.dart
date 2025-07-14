@@ -6,6 +6,11 @@ import '../features/transactions/data/repositories/transaction_repository_impl.d
 import '../features/transactions/domain/usecases/add_transaction_usecase.dart';
 import '../features/transactions/domain/usecases/fetch_transactions_usecase.dart';
 import '../dao/transaction_dao.dart';
+import '../core/design_system/app_colors.dart';
+import '../core/design_system/app_typography.dart';
+import '../core/design_system/app_spacing.dart';
+import '../core/design_system/app_radius.dart';
+import '../core/design_system/app_theme.dart';
 
 class TransactionPage extends StatelessWidget {
   const TransactionPage({Key? key}) : super(key: key);
@@ -36,78 +41,132 @@ class TransactionView extends StatelessWidget {
     final descController = TextEditingController();
     final valueController = TextEditingController();
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Transações')),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: descController,
-                    decoration: const InputDecoration(labelText: 'Descrição'),
+    return Theme(
+      data: AppTheme.light,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Transações',
+            style: AppTypography.title.copyWith(color: Colors.white),
+          ),
+          backgroundColor: AppColors.primary,
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: descController,
+                      decoration: const InputDecoration(labelText: 'Descrição'),
+                      style: AppTypography.body,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                SizedBox(
-                  width: 100,
-                  child: TextField(
-                    controller: valueController,
-                    decoration: const InputDecoration(labelText: 'Valor'),
-                    keyboardType: TextInputType.number,
+                  const SizedBox(width: AppSpacing.sm),
+                  SizedBox(
+                    width: 100,
+                    child: TextField(
+                      controller: valueController,
+                      decoration: const InputDecoration(labelText: 'Valor'),
+                      keyboardType: TextInputType.number,
+                      style: AppTypography.body,
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {
-                    final desc = descController.text;
-                    final value = double.tryParse(valueController.text) ?? 0.0;
-                    if (desc.isNotEmpty && value > 0) {
-                      bloc.add(
-                        AddTransaction(
-                          description: desc,
-                          value: value,
-                          date: DateTime.now().toIso8601String(),
+                  const SizedBox(width: AppSpacing.sm),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.secondary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                      ),
+                    ),
+                    onPressed: () {
+                      final desc = descController.text;
+                      final value =
+                          double.tryParse(valueController.text) ?? 0.0;
+                      if (desc.isNotEmpty && value > 0) {
+                        bloc.add(
+                          AddTransaction(
+                            description: desc,
+                            value: value,
+                            date: DateTime.now().toIso8601String(),
+                          ),
+                        );
+                        descController.clear();
+                        valueController.clear();
+                      }
+                    },
+                    child: const Icon(Icons.add),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: BlocBuilder<TransactionBloc, TransactionState>(
+                builder: (context, state) {
+                  if (state is TransactionLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is TransactionLoaded) {
+                    if (state.transactions.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'Nenhuma transação.',
+                          style: AppTypography.body,
                         ),
                       );
-                      descController.clear();
-                      valueController.clear();
                     }
-                  },
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: BlocBuilder<TransactionBloc, TransactionState>(
-              builder: (context, state) {
-                if (state is TransactionLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is TransactionLoaded) {
-                  if (state.transactions.isEmpty) {
-                    return const Center(child: Text('Nenhuma transação.'));
+                    return ListView.separated(
+                      itemCount: state.transactions.length,
+                      separatorBuilder: (_, __) => const Divider(),
+                      itemBuilder: (context, index) {
+                        final t = state.transactions[index];
+                        return Card(
+                          color: AppColors.card,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                          margin: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.xs,
+                            horizontal: 0,
+                          ),
+                          child: ListTile(
+                            title: Text(
+                              t.description,
+                              style: AppTypography.subtitle,
+                            ),
+                            subtitle: Text(
+                              t.date,
+                              style: AppTypography.caption,
+                            ),
+                            trailing: Text(
+                              'R\$ ${t.value.toStringAsFixed(2)}',
+                              style: AppTypography.body.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  } else if (state is TransactionError) {
+                    return Center(
+                      child: Text(
+                        state.message,
+                        style: AppTypography.body.copyWith(
+                          color: AppColors.error,
+                        ),
+                      ),
+                    );
                   }
-                  return ListView.builder(
-                    itemCount: state.transactions.length,
-                    itemBuilder: (context, index) {
-                      final t = state.transactions[index];
-                      return ListTile(
-                        title: Text(t.description),
-                        subtitle: Text(t.date),
-                        trailing: Text('R\$ ${t.value.toStringAsFixed(2)}'),
-                      );
-                    },
-                  );
-                } else if (state is TransactionError) {
-                  return Center(child: Text(state.message));
-                }
-                return const SizedBox.shrink();
-              },
+                  return const SizedBox.shrink();
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
