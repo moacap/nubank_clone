@@ -1,8 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:nubank_clone/repository/transaction_usecases.dart';
-import 'package:nubank_clone/repository/transaction_repository.dart';
-import 'package:nubank_clone/dao/transaction_dao.dart';
+import 'package:nubank_clone/features/transactions/domain/usecases/add_transaction_usecase.dart';
+import 'package:nubank_clone/features/transactions/domain/usecases/fetch_transactions_usecase.dart';
+import 'package:nubank_clone/features/transactions/domain/repositories/transaction_repository.dart';
+import 'package:nubank_clone/features/transactions/domain/entities/transaction_entity.dart';
 
 class MockTransactionRepository extends Mock implements TransactionRepository {}
 
@@ -46,9 +47,9 @@ void main() {
     test('deve delegar para o repository', () async {
       when(
         () => mockRepository.fetchTransactions(),
-      ).thenAnswer((_) async => []);
+      ).thenAnswer((_) async => <TransactionEntity>[]);
       final result = await fetchUseCase();
-      expect(result, isA<List<Transaction>>());
+      expect(result, isA<List<TransactionEntity>>());
       verify(() => mockRepository.fetchTransactions()).called(1);
     });
   });

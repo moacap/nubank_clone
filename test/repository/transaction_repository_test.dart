@@ -1,18 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:nubank_clone/repository/transaction_repository.dart';
-import 'package:nubank_clone/datasource/transaction_datasource.dart';
+import 'package:nubank_clone/features/transactions/data/repositories/transaction_repository_impl.dart';
+import 'package:nubank_clone/features/transactions/data/datasources/transaction_datasource.dart';
 import 'package:nubank_clone/dao/transaction_dao.dart';
+import 'package:nubank_clone/features/transactions/data/models/transaction_model.dart';
+import 'package:nubank_clone/features/transactions/domain/entities/transaction_entity.dart';
 
 class MockTransactionDataSource extends Mock implements TransactionDataSource {}
 
 void main() {
   late MockTransactionDataSource mockDataSource;
-  late TransactionRepositoryDrift repository;
+  late TransactionRepositoryImpl repository;
 
   setUp(() {
     mockDataSource = MockTransactionDataSource();
-    repository = TransactionRepositoryDrift(mockDataSource);
+    repository = TransactionRepositoryImpl(mockDataSource);
   });
 
   group('TransactionRepositoryDrift', () {
@@ -43,9 +45,9 @@ void main() {
     test('fetchTransactions deve delegar para o datasource', () async {
       when(
         () => mockDataSource.getAllTransactions(),
-      ).thenAnswer((_) async => []);
+      ).thenAnswer((_) async => <TransactionModel>[]);
       final result = await repository.fetchTransactions();
-      expect(result, isA<List<Transaction>>());
+      expect(result, isA<List<TransactionEntity>>());
       verify(() => mockDataSource.getAllTransactions()).called(1);
     });
   });

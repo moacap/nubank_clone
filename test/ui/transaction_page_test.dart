@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nubank_clone/ui/transaction_page.dart';
-import 'package:nubank_clone/bloc/transaction_bloc.dart';
-import 'package:nubank_clone/repository/transaction_usecases.dart';
-import 'package:nubank_clone/repository/transaction_repository.dart';
-import 'package:nubank_clone/datasource/transaction_datasource.dart';
+import 'package:nubank_clone/features/transactions/presentation/bloc/transaction_bloc.dart';
+import 'package:nubank_clone/features/transactions/domain/usecases/add_transaction_usecase.dart';
+import 'package:nubank_clone/features/transactions/domain/usecases/fetch_transactions_usecase.dart';
+import 'package:nubank_clone/features/transactions/domain/repositories/transaction_repository.dart';
+import 'package:nubank_clone/features/transactions/domain/entities/transaction_entity.dart';
 import 'package:nubank_clone/dao/transaction_dao.dart';
 
 class MockAddTransactionUseCase extends AddTransactionUseCase {
@@ -21,7 +22,7 @@ class MockAddTransactionUseCase extends AddTransactionUseCase {
 class MockFetchTransactionsUseCase extends FetchTransactionsUseCase {
   MockFetchTransactionsUseCase() : super(FakeRepository());
   @override
-  Future<List<Transaction>> call() async => [];
+  Future<List<TransactionEntity>> call() async => [];
 }
 
 class FakeRepository implements TransactionRepository {
@@ -32,7 +33,7 @@ class FakeRepository implements TransactionRepository {
     required String date,
   }) async => 1;
   @override
-  Future<List<Transaction>> fetchTransactions() async => [];
+  Future<List<TransactionEntity>> fetchTransactions() async => [];
 }
 
 void main() {

@@ -1,24 +1,23 @@
+import 'package:nubank_clone/features/transactions/data/models/transaction_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:nubank_clone/datasource/transaction_datasource.dart';
+import 'package:nubank_clone/features/transactions/data/datasources/transaction_datasource_drift.dart';
+
+// import 'package:nubank_clone/features/transactions/domain/entities/transaction_entity.dart';
 import 'package:nubank_clone/dao/transaction_dao.dart';
+// import 'package:drift/drift.dart';
 
-import 'package:nubank_clone/dao/transactions_table.dart';
-import 'package:drift/drift.dart';
-
-class MockAppDatabase extends Mock implements AppDatabase {}
-
-class MockTransaction extends Mock implements Transaction {}
-
-class FakeTransactionsCompanion extends Fake implements TransactionsCompanion {}
+class MockAppDatabase extends Mock implements AppDatabase {
+  @override
+  Future<int> insertTransaction(dynamic companion) async => 1;
+  @override
+  Future<List<Transaction>> getAllTransactions() async => <Transaction>[];
+}
 
 void main() {
   late MockAppDatabase mockDb;
   late TransactionDataSourceDrift dataSource;
 
-  setUpAll(() {
-    registerFallbackValue(FakeTransactionsCompanion());
-  });
   setUp(() {
     mockDb = MockAppDatabase();
     dataSource = TransactionDataSourceDrift(mockDb);
@@ -26,7 +25,9 @@ void main() {
 
   group('TransactionDataSourceDrift', () {
     test('saveTransaction deve delegar para o AppDatabase', () async {
-      when(() => mockDb.insertTransaction(any())).thenAnswer((_) async => 1);
+      when<dynamic>(
+        () => mockDb.insertTransaction(any()),
+      ).thenAnswer((_) async => 1);
       final result = await dataSource.saveTransaction(
         description: 'desc',
         value: 10.0,
@@ -37,11 +38,11 @@ void main() {
     });
 
     test('getAllTransactions deve delegar para o AppDatabase', () async {
-      when(
+      when<dynamic>(
         () => mockDb.getAllTransactions(),
       ).thenAnswer((_) async => <Transaction>[]);
       final result = await dataSource.getAllTransactions();
-      expect(result, isA<List<Transaction>>());
+      expect(result, isA<List<TransactionModel>>());
       verify(() => mockDb.getAllTransactions()).called(1);
     });
   });

@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:nubank_clone/bloc/transaction_bloc.dart';
-import 'package:nubank_clone/repository/transaction_usecases.dart';
+import 'package:nubank_clone/features/transactions/presentation/bloc/transaction_bloc.dart';
+import 'package:nubank_clone/features/transactions/domain/usecases/add_transaction_usecase.dart';
+import 'package:nubank_clone/features/transactions/domain/usecases/fetch_transactions_usecase.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockAddTransactionUseCase extends Mock implements AddTransactionUseCase {}
