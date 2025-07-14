@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/transaction_bloc.dart';
+import '../features/transactions/presentation/bloc/transaction_bloc.dart';
+import '../features/transactions/data/datasources/transaction_datasource_drift.dart';
+import '../features/transactions/data/repositories/transaction_repository_impl.dart';
+import '../features/transactions/domain/usecases/add_transaction_usecase.dart';
+import '../features/transactions/domain/usecases/fetch_transactions_usecase.dart';
 import '../dao/transaction_dao.dart';
-import '../datasource/transaction_datasource.dart';
-import '../repository/transaction_repository.dart';
-import '../repository/transaction_usecases.dart';
 
 class TransactionPage extends StatelessWidget {
   const TransactionPage({Key? key}) : super(key: key);
@@ -12,9 +13,8 @@ class TransactionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final db = AppDatabase();
-    final repository = TransactionRepositoryDrift(
-      TransactionDataSourceDrift(db),
-    );
+    final dataSource = TransactionDataSourceDrift(db);
+    final repository = TransactionRepositoryImpl(dataSource);
     final addUseCase = AddTransactionUseCase(repository);
     final fetchUseCase = FetchTransactionsUseCase(repository);
     return BlocProvider(
