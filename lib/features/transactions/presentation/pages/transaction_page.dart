@@ -7,9 +7,42 @@ class TransactionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final descriptionController = TextEditingController();
+    final valueController = TextEditingController();
     return Scaffold(
       appBar: AppBar(title: const Text('Transações')),
-      body: Center(child: Text('Página de transações (feature structure)')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              key: const Key('description_field'),
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Descrição',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              key: const Key('value_field'),
+              controller: valueController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Valor',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.add),
+              label: const Text('Adicionar'),
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

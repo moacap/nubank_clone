@@ -5,6 +5,7 @@ import '../core/design_system/app_spacing.dart';
 import '../core/design_system/app_radius.dart';
 import '../core/design_system/app_theme.dart';
 import 'package:nubank_clone/features/transactions/presentation/pages/transaction_page.dart';
+import 'package:nubank_clone/features/customers/presentation/pages/customers_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -91,10 +92,16 @@ class _HomePageState extends State<HomePage>
                           },
                         ),
                         _HomeIconButton(
-                          icon: Icons.credit_card,
-                          label: 'Cartões',
+                          icon: Icons.people,
+                          label: 'Clientes',
                           color: AppColors.secondary,
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const CustomersPage(),
+                              ),
+                            );
+                          },
                         ),
                         _HomeIconButton(
                           icon: Icons.attach_money,
