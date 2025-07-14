@@ -4,8 +4,6 @@ import '../core/design_system/app_typography.dart';
 import '../core/design_system/app_spacing.dart';
 import '../core/design_system/app_radius.dart';
 import '../core/design_system/app_theme.dart';
-import 'package:nubank_clone/features/transactions/presentation/pages/transaction_page.dart';
-import 'package:nubank_clone/features/customers/presentation/pages/customers_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -47,19 +45,11 @@ class _HomePageState extends State<HomePage>
           ),
           centerTitle: true,
           backgroundColor: AppColors.primary,
-          bottom: TabBar(
-            controller: _tabController,
-            indicatorColor: AppColors.accent,
-            tabs: const [
-              Tab(icon: Icon(Icons.dashboard), text: 'Início'),
-              Tab(icon: Icon(Icons.person), text: 'Perfil'),
-            ],
-          ),
         ),
         body: TabBarView(
           controller: _tabController,
           children: [
-            Padding(
+            SingleChildScrollView(
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,54 +60,59 @@ class _HomePageState extends State<HomePage>
                     style: AppTypography.title.copyWith(fontSize: titleFont),
                   ),
                   SizedBox(height: isTablet ? AppSpacing.lg : AppSpacing.md),
-                  Expanded(
-                    child: GridView.count(
-                      crossAxisCount: isTablet ? 4 : 2,
-                      mainAxisSpacing: isTablet ? AppSpacing.lg : AppSpacing.md,
-                      crossAxisSpacing: isTablet
-                          ? AppSpacing.lg
-                          : AppSpacing.md,
-                      childAspectRatio: 1,
-                      children: [
-                        _HomeIconButton(
-                          icon: Icons.account_balance_wallet,
-                          label: 'Transações',
-                          color: AppColors.primary,
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const TransactionPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _HomeIconButton(
-                          icon: Icons.people,
-                          label: 'Clientes',
-                          color: AppColors.secondary,
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const CustomersPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _HomeIconButton(
-                          icon: Icons.attach_money,
-                          label: 'Investimentos',
-                          color: AppColors.accent,
-                          onTap: () {},
-                        ),
-                        _HomeIconButton(
-                          icon: Icons.settings,
-                          label: 'Configurações',
-                          color: AppColors.border,
-                          onTap: () {},
-                        ),
-                      ],
-                    ),
+                  // Card de saldo
+                  _DashboardCard(
+                    title: 'Saldo disponível',
+                    value: 'R\$ 12.345,67',
+                    icon: Icons.account_balance_wallet,
+                    color: AppColors.primary,
                   ),
+                  SizedBox(height: AppSpacing.md),
+                  // Card de limite
+                  _DashboardCard(
+                    title: 'Limite do cartão',
+                    value: 'R\$ 5.000,00',
+                    icon: Icons.credit_card,
+                    color: AppColors.secondary,
+                  ),
+                  SizedBox(height: AppSpacing.md),
+                  // Gráfico de gastos (placeholder)
+                  _DashboardChart(),
+                  SizedBox(height: AppSpacing.md),
+                  // Atalhos Pix, Recarga, Fatura
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _ShortcutButton(
+                        icon: Icons.pix,
+                        label: 'Pix',
+                        color: AppColors.primary,
+                        onTap: () {},
+                      ),
+                      _ShortcutButton(
+                        icon: Icons.phone_android,
+                        label: 'Recarga',
+                        color: AppColors.secondary,
+                        onTap: () {},
+                      ),
+                      _ShortcutButton(
+                        icon: Icons.receipt_long,
+                        label: 'Fatura',
+                        color: AppColors.accent,
+                        onTap: () {},
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: AppSpacing.lg),
+                  // Últimas transações (mock)
+                  Text('Últimas transações', style: AppTypography.subtitle),
+                  SizedBox(height: AppSpacing.sm),
+                  _LastTransactionsList(),
+                  SizedBox(height: AppSpacing.lg),
+                  // Notificações (mock)
+                  Text('Notificações', style: AppTypography.subtitle),
+                  SizedBox(height: AppSpacing.sm),
+                  _NotificationsList(),
                 ],
               ),
             ),
@@ -130,18 +125,93 @@ class _HomePageState extends State<HomePage>
             ),
           ],
         ),
+        bottomNavigationBar: Material(
+          color: AppColors.primary,
+          child: TabBar(
+            controller: _tabController,
+            indicatorColor: AppColors.accent,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            tabs: const [
+              Tab(icon: Icon(Icons.dashboard), text: 'Início'),
+              Tab(icon: Icon(Icons.person), text: 'Perfil'),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-// Widget de botão de ícone para o dashboard
-class _HomeIconButton extends StatelessWidget {
+// Card de saldo, limite, etc.
+class _DashboardCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color color;
+  const _DashboardCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.color,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 36),
+            SizedBox(width: AppSpacing.md),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: AppTypography.subtitle),
+                Text(value, style: AppTypography.title.copyWith(color: color)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Gráfico de gastos (placeholder)
+class _DashboardChart extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      elevation: 2,
+      child: Container(
+        height: 120,
+        alignment: Alignment.center,
+        child: Text(
+          'Gráfico de gastos do mês (em breve)',
+          style: AppTypography.body,
+        ),
+      ),
+    );
+  }
+}
+
+// Atalhos Pix, Recarga, Fatura
+class _ShortcutButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
   final VoidCallback onTap;
-  const _HomeIconButton({
+  const _ShortcutButton({
     required this.icon,
     required this.label,
     required this.color,
@@ -151,35 +221,84 @@ class _HomeIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = MediaQuery.of(context).size.width >= 600;
     return InkWell(
       borderRadius: BorderRadius.circular(AppRadius.md),
       onTap: onTap,
       child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
         decoration: BoxDecoration(
           color: color.withOpacity(0.08),
           borderRadius: BorderRadius.circular(AppRadius.md),
         ),
-        padding: EdgeInsets.symmetric(
-          vertical: isTablet ? AppSpacing.lg : AppSpacing.md,
-          horizontal: AppSpacing.sm,
-        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: isTablet ? 56 : 36, color: color),
-            SizedBox(height: isTablet ? AppSpacing.md : AppSpacing.sm),
-            Text(
-              label,
-              style: AppTypography.subtitle.copyWith(
-                fontSize: isTablet ? 22 : 16,
-                color: color,
-              ),
-              textAlign: TextAlign.center,
-            ),
+            Icon(icon, color: color, size: 28),
+            SizedBox(height: 4),
+            Text(label, style: AppTypography.body.copyWith(color: color)),
           ],
         ),
       ),
+    );
+  }
+}
+
+// Lista de últimas transações (mock)
+class _LastTransactionsList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      {'title': 'Pix recebido', 'value': '+R\$ 500,00', 'color': Colors.green},
+      {
+        'title': 'Pagamento fatura',
+        'value': '-R\$ 300,00',
+        'color': Colors.red,
+      },
+      {'title': 'Transferência', 'value': '-R\$ 120,00', 'color': Colors.red},
+      {'title': 'Depósito', 'value': '+R\$ 1.000,00', 'color': Colors.green},
+    ];
+    return Column(
+      children: items
+          .map(
+            (item) => ListTile(
+              leading: Icon(Icons.swap_horiz, color: item['color'] as Color),
+              title: Text(item['title'] as String),
+              trailing: Text(
+                item['value'] as String,
+                style: TextStyle(color: item['color'] as Color),
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+}
+
+// Lista de notificações (mock)
+class _NotificationsList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      {
+        'title': 'Fatura fechada',
+        'subtitle': 'Sua fatura de julho está disponível.',
+      },
+      {'title': 'Promoção', 'subtitle': 'Ganhe cashback usando o cartão!'},
+      {
+        'title': 'Atualização',
+        'subtitle': 'Novos recursos disponíveis no app.',
+      },
+    ];
+    return Column(
+      children: items
+          .map(
+            (item) => ListTile(
+              leading: Icon(Icons.notifications, color: AppColors.primary),
+              title: Text(item['title'] as String),
+              subtitle: Text(item['subtitle'] as String),
+            ),
+          )
+          .toList(),
     );
   }
 }

@@ -46,4 +46,26 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>
+  <key>NSLocalNetworkUsageDescription</key>
+  <string>Este app precisa acessar a rede local para depuração e comunicação com dispositivos na mesma rede.</string>
+  <key>NSBonjourServices</key>
+  <array>
+	<string>_dartobservatory._tcp</string>
+  </array>
+  <key>NSAppTransportSecurity</key>
+  <dict>
+	<key>NSAllowsArbitraryLoads</key>
+	<true/>
+  <key>NSLocalNetworkUsageDescription</key>
+  <string>Este app precisa acessar a rede local para depuração e comunicação com dispositivos na mesma rede.</string>
+  <key>NSBonjourServices</key>
+  <array>
+	<string>_dartobservatory._tcp</string>
+  </array>
+  <key>NSAppTransportSecurity</key>
+  <dict>
+	<key>NSAllowsArbitraryLoads</key>
+	<true/>
+  </dict>
+</dict>
 </plist>
